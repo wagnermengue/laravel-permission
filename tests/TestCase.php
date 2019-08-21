@@ -23,6 +23,9 @@ abstract class TestCase extends Orchestra
     protected $testUserRole;
 
     /** @var \Spatie\Permission\Models\Role */
+    protected $testUserRoleExpired;
+
+    /** @var \Spatie\Permission\Models\Role */
     protected $testAdminRole;
 
     /** @var \Spatie\Permission\Models\Permission */
@@ -40,6 +43,7 @@ abstract class TestCase extends Orchestra
 
         $this->testUser = User::first();
         $this->testUserRole = app(Role::class)->find(1);
+        $this->testUserRoleExpired = app(Role::class)->find(4);
         $this->testUserPermission = app(Permission::class)->find(1);
 
         $this->testAdmin = Admin::first();
@@ -119,6 +123,7 @@ abstract class TestCase extends Orchestra
         $app[Role::class]->create(['name' => 'testRole']);
         $app[Role::class]->create(['name' => 'testRole2']);
         $app[Role::class]->create(['name' => 'testAdminRole', 'guard_name' => 'admin']);
+        $app[Role::class]->create(['name' => 'testRoleExpired', 'expires' => \Carbon\Carbon::now()->subDay(1)]);
         $app[Permission::class]->create(['name' => 'edit-articles']);
         $app[Permission::class]->create(['name' => 'edit-news']);
         $app[Permission::class]->create(['name' => 'edit-blog']);

@@ -3,6 +3,7 @@
 namespace Spatie\Permission\Test;
 
 use Spatie\Permission\Contracts\Role;
+use Spatie\Permission\Exceptions\RoleExpired;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Exceptions\RoleDoesNotExist;
 use Spatie\Permission\Exceptions\GuardDoesNotMatch;
@@ -231,5 +232,13 @@ class RoleTest extends TestCase
     public function it_belongs_to_the_default_guard_by_default()
     {
         $this->assertEquals($this->app['config']->get('auth.defaults.guard'), $this->testUserRole->guard_name);
+    }
+
+    /** @test */
+    public function it_throws_an_exception_when_role_expired()
+    {
+        $this->expectException(RoleExpired::class);
+
+        $this->testUserRoleExpired->hasPermissionTo('edit-articles');
     }
 }

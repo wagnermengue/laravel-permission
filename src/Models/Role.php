@@ -2,6 +2,8 @@
 
 namespace Spatie\Permission\Models;
 
+use Carbon\Carbon;
+use Spatie\Permission\Exceptions\RoleExpired;
 use Spatie\Permission\Guard;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Permission\Traits\HasPermissions;
@@ -19,6 +21,8 @@ class Role extends Model implements RoleContract
     use RefreshesPermissionCache;
 
     protected $guarded = ['id'];
+
+    protected $dates = ['expires'];
 
     public function __construct(array $attributes = [])
     {
@@ -153,6 +157,23 @@ class Role extends Model implements RoleContract
             throw GuardDoesNotMatch::create($permission->guard_name, $this->getGuardNames());
         }
 
+        if ($this->isExpired()) {
+            throw RoleExpired::expired();
+        }
+
         return $this->permissions->contains('id', $permission->id);
+    }
+
+    /**
+     * @return bool
+     */
+    private function isExpired()
+    {
+        if ($this->expires) {
+            if ($this->expires < Carbon::now()) {
+                return true;
+            }
+        }
+        return false;
     }
 }
